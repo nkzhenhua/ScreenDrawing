@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Screen Drawing</string>
+    <string name="exit">Exit</string>
+    <string name="toggle_drawing">Toggle Drawing</string>
+    <string name="undo">Undo</string>
+    <string name="save">Save</string>
+</resources>
