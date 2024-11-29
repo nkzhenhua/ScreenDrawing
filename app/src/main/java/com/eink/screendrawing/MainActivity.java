@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> overlayPermissionLauncher;
     private static final int PERMISSION_REQUEST_CODE = 1234;
     private ActivityResultLauncher<String> requestPermissionLauncher;
+    private static final int MENU_INITIAL_X = 100;
+    private static final int MENU_INITIAL_Y = 100;
+    private static final int SCREENSHOT_DELAY_MS = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,40 +160,20 @@ public class MainActivity extends AppCompatActivity {
                 PixelFormat.TRANSLUCENT);
         menuParams.gravity = Gravity.TOP | Gravity.START;
         
-        // Add initial position if desired
-        menuParams.x = 100;
-        menuParams.y = 100;
-
-        windowManager.addView(menuView, menuParams);
-        setupMenuButtons();
+        // Extract menu position to constants
+        menuParams.x = MENU_INITIAL_X;
+        menuParams.y = MENU_INITIAL_Y;
         
-        // Make menu draggable
-        View dragHandle = menuView.findViewById(R.id.dragHandle);
-        dragHandle.setOnTouchListener(new View.OnTouchListener() {
-            private int initialX;
-            private int initialY;
-            private float initialTouchX;
-            private float initialTouchY;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        initialX = menuParams.x;
-                        initialY = menuParams.y;
-                        initialTouchX = event.getRawX();
-                        initialTouchY = event.getRawY();
-                        return true;
-
-                    case MotionEvent.ACTION_MOVE:
-                        menuParams.x = initialX + (int) (event.getRawX() - initialTouchX);
-                        menuParams.y = initialY + (int) (event.getRawY() - initialTouchY);
-                        windowManager.updateViewLayout(menuView, menuParams);
-                        return true;
-                }
-                return false;
-            }
-        });
+        // Add error handling
+        try {
+            windowManager.addView(menuView, menuParams);
+            setupMenuButtons();
+            setupDragHandle(menuParams);
+        } catch (WindowManager.BadTokenException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to initialize menu", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     private void setupMenuButtons() {
@@ -228,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                     
                     // Show the menu again
                     menuView.setVisibility(View.VISIBLE);
-                }, 100);
+                }, SCREENSHOT_DELAY_MS);
             }
         });
 
@@ -333,6 +316,47 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) 
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    private void setupDragHandle(final WindowManager.LayoutParams menuParams) {
+        View dragHandle = menuView.findViewById(R.id.dragHandle);
+        DragTouchListener dragTouchListener = new DragTouchListener(menuParams);
+        dragHandle.setOnTouchListener(dragTouchListener);
+    }
+
+    private class DragTouchListener implements View.OnTouchListener {
+        private final WindowManager.LayoutParams params;
+        private int initialX;
+        private int initialY;
+        private float initialTouchX;
+        private float initialTouchY;
+
+        DragTouchListener(WindowManager.LayoutParams params) {
+            this.params = params;
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    initialX = params.x;
+                    initialY = params.y;
+                    initialTouchX = event.getRawX();
+                    initialTouchY = event.getRawY();
+                    return true;
+
+                case MotionEvent.ACTION_MOVE:
+                    params.x = initialX + (int) (event.getRawX() - initialTouchX);
+                    params.y = initialY + (int) (event.getRawY() - initialTouchY);
+                    try {
+                        windowManager.updateViewLayout(menuView, params);
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+            }
+            return false;
         }
     }
 }

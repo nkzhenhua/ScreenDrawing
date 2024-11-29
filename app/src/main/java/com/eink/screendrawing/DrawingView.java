@@ -26,6 +26,8 @@ public class DrawingView extends View {
     private Paint paint;
     private List<PathData> pathDataList;
     private Bitmap bitmap;
+    private float currentStrokeWidth = STROKE_WIDTH;
+    private int currentColor = DEFAULT_COLOR;
 
     public DrawingView(Context context) {
         super(context);
@@ -49,8 +51,10 @@ public class DrawingView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        if (bitmap != null) {
+            bitmap.recycle(); // Properly recycle old bitmap
+        }
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
     }
 
     @Override
@@ -112,24 +116,28 @@ public class DrawingView extends View {
         }
     }
 
-    public void saveToGallery() {
+    public boolean saveToGallery() {
+        if (bitmap == null) {
+            return false;
+        }
+        
         String fileName = "Screenshot_" + System.currentTimeMillis() + ".png";
         File file = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), fileName);
 
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
-            fos.close();
-
+            
             // Notify gallery
             MediaScannerConnection.scanFile(getContext(),
                     new String[]{file.toString()},
                     null,
                     null);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -149,5 +157,15 @@ public class DrawingView extends View {
             // Optionally clear the canvas when disabled
             // clearCanvas();  // Uncomment if you want to clear drawings when disabled
         }
+    }
+
+    public void setStrokeWidth(float width) {
+        currentStrokeWidth = width;
+        paint.setStrokeWidth(width);
+    }
+    
+    public void setColor(int color) {
+        currentColor = color;
+        paint.setColor(color);
     }
 }
