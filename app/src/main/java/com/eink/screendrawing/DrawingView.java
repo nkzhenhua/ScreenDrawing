@@ -66,24 +66,39 @@ public class DrawingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // Return false immediately if disabled, allowing the event to pass through
         if (!isEnabled()) {
             return false;
         }
 
-        float x = event.getX();
-        float y = event.getY();
+        // Get the pointer ID
+        int pointerIndex = event.getActionIndex();
+        float x = event.getX(pointerIndex);
+        float y = event.getY(pointerIndex);
 
-        switch (event.getAction()) {
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                currentPath.moveTo(x, y);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                currentPath.lineTo(x, y);
-                break;
-            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_DOWN:
                 currentPath = new Path();
+                currentPath.moveTo(x, y);
                 pathDataList.add(new PathData(currentPath, new Paint(paint)));
                 break;
+            case MotionEvent.ACTION_MOVE:
+                if (currentPath != null) {
+                    currentPath.lineTo(x, y);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+                if (currentPath != null) {
+                    currentPath.lineTo(x, y);
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                // Handle cancellation if needed
+                break;
+            default:
+                return false;
         }
 
         invalidate();
@@ -115,6 +130,24 @@ public class DrawingView extends View {
                     null);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // Add this method to clear the canvas when disabled
+    public void clearCanvas() {
+        pathDataList.clear();
+        currentPath = new Path();
+        pathDataList.add(new PathData(currentPath, new Paint(paint)));
+        invalidate();
+    }
+
+    // Optional: Add this method to handle enable/disable state changes
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (!enabled) {
+            // Optionally clear the canvas when disabled
+            // clearCanvas();  // Uncomment if you want to clear drawings when disabled
         }
     }
 }
