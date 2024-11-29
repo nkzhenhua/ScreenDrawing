@@ -17,11 +17,29 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import android.os.Environment;
+import android.media.MediaScannerConnection;
+import android.graphics.Bitmap;
+import android.content.ContentValues;
+import android.content.ContentResolver;
+import android.provider.MediaStore;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Handler;
+import java.io.OutputStream;
+import androidx.core.content.ContextCompat;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_OVERLAY_PERMISSION = 1001;
@@ -30,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private View menuView;
     private boolean isDrawingEnabled = true;
     private ActivityResultLauncher<Intent> overlayPermissionLauncher;
+    private static final int PERMISSION_REQUEST_CODE = 1234;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +92,21 @@ public class MainActivity extends AppCompatActivity {
         } else {
             initializeOverlay();
         }
+
+        // Register permission launcher
+        requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (!isGranted) {
+                    Toast.makeText(this, 
+                        "Storage permission required to save screenshots", 
+                        Toast.LENGTH_LONG).show();
+                }
+            }
+        );
+
+        // Check permissions
+        checkStoragePermission();
     }
 
     private void initializeOverlay() {
@@ -181,7 +216,21 @@ public class MainActivity extends AppCompatActivity {
 
         undoButton.setOnClickListener(v -> drawingView.undo());
 
-        saveButton.setOnClickListener(v -> saveScreenshot());
+        saveButton.setOnClickListener(v -> {
+            if (drawingView != null) {
+                // Hide the menu temporarily for the screenshot
+                menuView.setVisibility(View.INVISIBLE);
+                
+                // Add a small delay to ensure menu is hidden
+                new Handler().postDelayed(() -> {
+                    // Take the screenshot
+                    takeScreenshot();
+                    
+                    // Show the menu again
+                    menuView.setVisibility(View.VISIBLE);
+                }, 100);
+            }
+        });
 
         clearButton.setOnClickListener(v -> {
             if (drawingView != null) {
@@ -190,9 +239,68 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void saveScreenshot() {
-        // Implementation for saving screenshot
-        // Will be added in DrawingView class
+    private void takeScreenshot() {
+        try {
+            // Get date for filename
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            String fileName = "Screenshot_" + timeStamp + ".png";
+            
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // Android 10 (API 29) and above
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
+                values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+
+                ContentResolver resolver = getContentResolver();
+                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                if (imageUri != null) {
+                    // Take screenshot
+                    View root = getWindow().getDecorView().getRootView();
+                    root.setDrawingCacheEnabled(true);
+                    Bitmap bitmap = Bitmap.createBitmap(root.getDrawingCache());
+                    root.setDrawingCacheEnabled(false);
+
+                    // Save the image
+                    OutputStream outputStream = resolver.openOutputStream(imageUri);
+                    if (outputStream != null) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                        outputStream.close();
+                        Toast.makeText(this, "Screenshot saved to Gallery", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else {
+                // Android 8-9
+                File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                File file = new File(path, fileName);
+                path.mkdirs();
+
+                // Take screenshot
+                View root = getWindow().getDecorView().getRootView();
+                root.setDrawingCacheEnabled(true);
+                Bitmap bitmap = Bitmap.createBitmap(root.getDrawingCache());
+                root.setDrawingCacheEnabled(false);
+
+                // Save the file
+                FileOutputStream fos = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.flush();
+                fos.close();
+
+                // Notify gallery
+                MediaScannerConnection.scanFile(this,
+                        new String[]{file.getAbsolutePath()},
+                        new String[]{"image/png"},
+                        null);
+                
+                Toast.makeText(this, "Screenshot saved to Gallery", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to save screenshot", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void cleanup() {
@@ -210,5 +318,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         cleanup();
         super.onDestroy();
+    }
+
+    private void checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Android 10 (API 29) and above
+            // No need to request storage permission for saving to Pictures directory
+            return;
+        }
+        
+        // For Android 8-9
+        if (ContextCompat.checkSelfPermission(
+                this, 
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) 
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
     }
 }

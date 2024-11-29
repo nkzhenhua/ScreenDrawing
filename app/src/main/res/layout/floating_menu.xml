@@ -4,50 +4,71 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#00000000"
+    android:background="#FFFFFF"
     android:padding="8dp">
 
-    <View
+    <!-- Drag Handle -->
+    <LinearLayout
         android:id="@+id/dragHandle"
         android:layout_width="100dp"
-        android:layout_height="10dp"
-        android:layout_marginBottom="4dp"
-        android:background="#40808080"
-        android:layout_gravity="center" />
+        android:layout_height="24dp"
+        android:layout_marginBottom="8dp"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:gravity="center">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⠿ ⠿ ⠿"
+            android:textColor="#000000"
+            android:textSize="12sp"/>
+    </LinearLayout>
 
+    <!-- Buttons with E-ink friendly styling -->
     <Button
         android:id="@+id/exitButton"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginBottom="4dp"
+        android:background="@drawable/eink_button_background"
+        android:textColor="#000000"
         android:text="@string/exit" />
 
     <Button
         android:id="@+id/toggleButton"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginBottom="4dp"
+        android:background="@drawable/eink_button_background"
+        android:textColor="#000000"
         android:text="@string/disable" />
 
     <Button
         android:id="@+id/undoButton"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginBottom="4dp"
+        android:background="@drawable/eink_button_background"
+        android:textColor="#000000"
         android:text="@string/undo" />
 
     <Button
         android:id="@+id/saveButton"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginBottom="4dp"
+        android:background="@drawable/eink_button_background"
+        android:textColor="#000000"
         android:text="@string/save" />
 
     <Button
         android:id="@+id/clearButton"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginBottom="4dp"
+        android:background="@drawable/eink_button_background"
+        android:textColor="#000000"
         android:text="Clear" />
 
 </LinearLayout>
