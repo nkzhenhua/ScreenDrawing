@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Screen Drawing</string>
+    <string name="app_name">ScreenDraw</string>
     <string name="disable">Disable</string>
     <string name="enable">Enable</string>
     <string name="undo">Undo</string>
