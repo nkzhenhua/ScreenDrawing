@@ -23,7 +23,7 @@ public class OverlayService extends Service {
     private WindowManager windowManager;
     private DrawingView drawingView;
     private View menuView;
-    private boolean isDrawingEnabled = true;
+    private boolean isDrawingEnabled = false;
 
     @Override
     public void onCreate() {
@@ -56,9 +56,9 @@ public class OverlayService extends Service {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         );
-        menuParams.gravity = Gravity.TOP | Gravity.START;
-        menuParams.x = 100;
-        menuParams.y = 100;
+        menuParams.gravity = Gravity.TOP | Gravity.LEFT;
+        menuParams.x = 0;
+        menuParams.y = 0;
 
         windowManager.addView(menuView, menuParams);
         setupMenuButtons(menuParams);
@@ -70,13 +70,19 @@ public class OverlayService extends Service {
         Button undoButton = menuView.findViewById(R.id.undoButton);
         Button clearButton = menuView.findViewById(R.id.clearButton);
 
+        // Start with drawing disabled
+        isDrawingEnabled = false;
+        drawingView.setEnabled(isDrawingEnabled);
+        updateDrawingViewTouchability(isDrawingEnabled);
+        toggleButton.setText(isDrawingEnabled ? "✎ STOP" : "✎ DRAW");
+
         exitButton.setOnClickListener(v -> stopSelf());
 
         toggleButton.setOnClickListener(v -> {
             isDrawingEnabled = !isDrawingEnabled;
             drawingView.setEnabled(isDrawingEnabled);
+            toggleButton.setText(isDrawingEnabled ? "✎ STOP" : "✎ DRAW");
             updateDrawingViewTouchability(isDrawingEnabled);
-            toggleButton.setText(isDrawingEnabled ? R.string.disable : R.string.enable);
         });
 
         undoButton.setOnClickListener(v -> drawingView.undo());
