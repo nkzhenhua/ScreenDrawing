@@ -5,52 +5,55 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="#FFFFFF"
+    android:gravity="center"
     android:padding="4dp">
 
-    <!-- Drag Handle with dots to indicate movable -->
+    <!-- Drag Handle -->
     <LinearLayout
         android:id="@+id/dragHandle"
-        android:layout_width="90dp"
-        android:layout_height="20dp"
-        android:layout_marginBottom="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:background="#FFFFFF"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:padding="4dp">
 
         <TextView
+            android:id="@+id/dragHandleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⋮⋮⋮  ⋮⋮⋮  ⋮⋮⋮"
+            android:text="⠿ ⠿ ⠿"
             android:textColor="#000000"
             android:textStyle="bold"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:gravity="center"/>
     </LinearLayout>
 
     <Button
         android:id="@+id/exitButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="4dp"
+        android:layout_margin="4dp"
         android:text="✕ EXIT" />
 
     <Button
         android:id="@+id/toggleButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="4dp"
+        android:layout_margin="4dp"
         android:text="✎ DRAW" />
 
     <Button
         android:id="@+id/undoButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="4dp"
+        android:layout_margin="4dp"
         android:text="↶ UNDO" />
 
     <Button
         android:id="@+id/clearButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
+        android:layout_margin="4dp"
         android:text="⌧ CLEAR" />
 
 </LinearLayout>

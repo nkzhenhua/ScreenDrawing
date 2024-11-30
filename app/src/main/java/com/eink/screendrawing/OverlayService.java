@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -11,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 // Your custom view imports
 import com.eink.screendrawing.DrawingView;
@@ -93,31 +96,61 @@ public class OverlayService extends Service {
 
     private void setupDragHandle(final WindowManager.LayoutParams menuParams) {
         View dragHandle = menuView.findViewById(R.id.dragHandle);
-        dragHandle.setOnTouchListener(new View.OnTouchListener() {
-            private int initialX;
-            private int initialY;
-            private float initialTouchX;
-            private float initialTouchY;
+        final LinearLayout menuLayout = (LinearLayout) menuView;
+        final int[] initialX = new int[1];
+        final int[] initialY = new int[1];
+        final float[] initialTouchX = new float[1];
+        final float[] initialTouchY = new float[1];
+        final int EDGE_THRESHOLD = 100;
 
+        dragHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        initialX = menuParams.x;
-                        initialY = menuParams.y;
-                        initialTouchX = event.getRawX();
-                        initialTouchY = event.getRawY();
+                        initialX[0] = menuParams.x;
+                        initialY[0] = menuParams.y;
+                        initialTouchX[0] = event.getRawX();
+                        initialTouchY[0] = event.getRawY();
                         return true;
 
                     case MotionEvent.ACTION_MOVE:
-                        menuParams.x = initialX + (int) (event.getRawX() - initialTouchX);
-                        menuParams.y = initialY + (int) (event.getRawY() - initialTouchY);
+                        menuParams.x = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
+                        menuParams.y = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
+                        
+                        // Get screen dimensions using non-deprecated method
+                        DisplayMetrics metrics = getResources().getDisplayMetrics();
+                        int screenWidth = metrics.widthPixels;
+                        int screenHeight = metrics.heightPixels;
+
+                        // Check position and update orientation
+                        if (menuParams.x < EDGE_THRESHOLD || screenWidth - menuParams.x < EDGE_THRESHOLD) {
+                            if (menuLayout.getOrientation() != LinearLayout.VERTICAL) {
+                                menuLayout.setOrientation(LinearLayout.VERTICAL);
+                                updateDragHandleForOrientation(true);
+                            }
+                        } else if (menuParams.y < EDGE_THRESHOLD || screenHeight - menuParams.y < EDGE_THRESHOLD) {
+                            if (menuLayout.getOrientation() != LinearLayout.HORIZONTAL) {
+                                menuLayout.setOrientation(LinearLayout.HORIZONTAL);
+                                updateDragHandleForOrientation(false);
+                            }
+                        }
+
                         windowManager.updateViewLayout(menuView, menuParams);
                         return true;
                 }
                 return false;
             }
         });
+    }
+
+    private void updateDragHandleForOrientation(boolean isVertical) {
+        TextView dragHandleText = menuView.findViewById(R.id.dragHandleText);
+        if (isVertical) {
+            dragHandleText.setText("⠿ ⠿ ⠿"); // Three groups for vertical
+        } else {
+            dragHandleText.setText("⠿ ⠿"); // Two groups for horizontal
+        }
     }
 
     private void updateDrawingViewTouchability(boolean enabled) {
