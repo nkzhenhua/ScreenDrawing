@@ -4,9 +4,7 @@ the menu contain at least two buttons: exit which exit the app totally; on/off b
 
 # Features
 - Draw on the screen or on top of other apps
-- Drawing lines with different sizes
 - Undo button to undo the last drawing
-- Save whole screen snapshot as image
 - On/Off button to enable/disable the drawing. when is is disabled, only the menu is visible, and the screen touch events are applied to the other apps.
 - Exit button to exit the app
 
