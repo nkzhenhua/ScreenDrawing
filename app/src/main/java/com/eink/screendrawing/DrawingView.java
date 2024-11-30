@@ -14,7 +14,7 @@ import java.util.List;
 // ... other imports
 public class DrawingView extends View {
     // Constants
-    private static final float STROKE_WIDTH = 8f;
+    private static final float STROKE_WIDTH = 5f;
     private static final int DEFAULT_COLOR = Color.BLACK;
     private Path currentPath;
     private Paint paint;
