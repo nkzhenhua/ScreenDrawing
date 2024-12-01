@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="#FFFFFF"
     android:gravity="center"
-    android:padding="4dp">
+    android:padding="1dp">
 
     <!-- Drag Handle -->
     <LinearLayout
@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:background="#FFFFFF"
         android:gravity="center"
-        android:padding="4dp">
+        android:padding="1dp">
 
         <TextView
             android:id="@+id/dragHandleText"
@@ -32,28 +32,28 @@
         android:id="@+id/exitButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
-        android:layout_margin="4dp"
+        android:layout_margin="1dp"
         android:text="✕ EXIT" />
 
     <Button
         android:id="@+id/toggleButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
-        android:layout_margin="4dp"
+        android:layout_margin="1dp"
         android:text="✎ DRAW" />
 
     <Button
         android:id="@+id/undoButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
-        android:layout_margin="4dp"
+        android:layout_margin="1dp"
         android:text="↶ UNDO" />
 
     <Button
         android:id="@+id/clearButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
-        android:layout_margin="4dp"
+        android:layout_margin="1dp"
         android:text="⌧ CLEAR" />
 
 </LinearLayout>
