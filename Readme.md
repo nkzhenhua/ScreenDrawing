@@ -8,6 +8,7 @@ Screen Draw runs as an overlay service, providing a transparent canvas across yo
 ## Features
 - Draw freely anywhere on your screen or on top of other applications
 - Floating menu that stays accessible at all times
+- Drag to move the menu on the screen. Double click on the top of the menu, show/hide the menu
 - Toggle drawing mode on/off:
   - When ON: Draw on the screen
   - When OFF: Touch events pass through to underlying apps
