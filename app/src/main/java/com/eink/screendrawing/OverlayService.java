@@ -27,6 +27,9 @@ public class OverlayService extends Service {
     private DrawingView drawingView;
     private View menuView;
     private boolean isDrawingEnabled = false;
+    private boolean isMenuCollapsed = false;
+    private long lastClickTime = 0;
+    private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
 
     @Override
     public void onCreate() {
@@ -108,6 +111,16 @@ public class OverlayService extends Service {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        // Handle double click detection
+                        long clickTime = System.currentTimeMillis();
+                        if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                            // Double click detected
+                            toggleMenuButtons();
+                            return true;
+                        }
+                        lastClickTime = clickTime;
+
+                        // Normal drag initialization
                         initialX[0] = menuParams.x;
                         initialY[0] = menuParams.y;
                         initialTouchX[0] = event.getRawX();
@@ -115,28 +128,30 @@ public class OverlayService extends Service {
                         return true;
 
                     case MotionEvent.ACTION_MOVE:
-                        menuParams.x = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
-                        menuParams.y = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
-                        
-                        // Get screen dimensions using non-deprecated method
-                        DisplayMetrics metrics = getResources().getDisplayMetrics();
-                        int screenWidth = metrics.widthPixels;
-                        int screenHeight = metrics.heightPixels;
+                        // Only handle drag if it's not a double click
+                        if (System.currentTimeMillis() - lastClickTime > 100) {
+                            menuParams.x = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
+                            menuParams.y = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
 
-                        // Check position and update orientation
-                        if (menuParams.x < EDGE_THRESHOLD || screenWidth - menuParams.x < EDGE_THRESHOLD) {
-                            if (menuLayout.getOrientation() != LinearLayout.VERTICAL) {
-                                menuLayout.setOrientation(LinearLayout.VERTICAL);
-                                updateDragHandleForOrientation(true);
+                            // Rest of your existing drag code...
+                            DisplayMetrics metrics = getResources().getDisplayMetrics();
+                            int screenWidth = metrics.widthPixels;
+                            int screenHeight = metrics.heightPixels;
+
+                            if (menuParams.x < EDGE_THRESHOLD || screenWidth - menuParams.x < EDGE_THRESHOLD) {
+                                if (menuLayout.getOrientation() != LinearLayout.VERTICAL) {
+                                    menuLayout.setOrientation(LinearLayout.VERTICAL);
+                                    updateDragHandleForOrientation(true);
+                                }
+                            } else if (menuParams.y < EDGE_THRESHOLD || screenHeight - menuParams.y < EDGE_THRESHOLD) {
+                                if (menuLayout.getOrientation() != LinearLayout.HORIZONTAL) {
+                                    menuLayout.setOrientation(LinearLayout.HORIZONTAL);
+                                    updateDragHandleForOrientation(false);
+                                }
                             }
-                        } else if (menuParams.y < EDGE_THRESHOLD || screenHeight - menuParams.y < EDGE_THRESHOLD) {
-                            if (menuLayout.getOrientation() != LinearLayout.HORIZONTAL) {
-                                menuLayout.setOrientation(LinearLayout.HORIZONTAL);
-                                updateDragHandleForOrientation(false);
-                            }
+
+                            windowManager.updateViewLayout(menuView, menuParams);
                         }
-
-                        windowManager.updateViewLayout(menuView, menuParams);
                         return true;
                 }
                 return false;
@@ -192,5 +207,21 @@ public class OverlayService extends Service {
                 }
             }
         }
+    }
+    private void toggleMenuButtons() {
+        isMenuCollapsed = !isMenuCollapsed;
+
+        // Find all buttons in the menu
+        Button exitButton = menuView.findViewById(R.id.exitButton);
+        Button toggleButton = menuView.findViewById(R.id.toggleButton);
+        Button undoButton = menuView.findViewById(R.id.undoButton);
+        Button clearButton = menuView.findViewById(R.id.clearButton);
+
+        // Set visibility for all buttons
+        int visibility = isMenuCollapsed ? View.GONE : View.VISIBLE;
+        exitButton.setVisibility(visibility);
+        toggleButton.setVisibility(visibility);
+        undoButton.setVisibility(visibility);
+        clearButton.setVisibility(visibility);
     }
 }
