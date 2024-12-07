@@ -33,27 +33,27 @@
         android:layout_width="90dp"
         android:layout_height="40dp"
         android:layout_margin="1dp"
-        android:text="✕ EXIT" />
+        android:text="@string/exit" />
 
     <Button
         android:id="@+id/toggleButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
         android:layout_margin="1dp"
-        android:text="✎ DRAW" />
+        android:text="@string/draw" />
 
     <Button
         android:id="@+id/undoButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
         android:layout_margin="1dp"
-        android:text="↶ UNDO" />
+        android:text="@string/undo" />
 
     <Button
         android:id="@+id/clearButton"
         android:layout_width="90dp"
         android:layout_height="40dp"
         android:layout_margin="1dp"
-        android:text="⌧ CLEAR" />
+        android:text="@string/clear" />
 
 </LinearLayout>

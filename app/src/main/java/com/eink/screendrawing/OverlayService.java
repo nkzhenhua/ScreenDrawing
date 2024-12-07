@@ -80,14 +80,14 @@ public class OverlayService extends Service {
         isDrawingEnabled = false;
         drawingView.setEnabled(isDrawingEnabled);
         updateDrawingViewTouchability(isDrawingEnabled);
-        toggleButton.setText(isDrawingEnabled ? "✎ STOP" : "✎ DRAW");
+        toggleButton.setText(isDrawingEnabled ? getString(R.string.stop) : getString(R.string.draw));
 
         exitButton.setOnClickListener(v -> stopSelf());
 
         toggleButton.setOnClickListener(v -> {
             isDrawingEnabled = !isDrawingEnabled;
             drawingView.setEnabled(isDrawingEnabled);
-            toggleButton.setText(isDrawingEnabled ? "✎ STOP" : "✎ DRAW");
+            toggleButton.setText(isDrawingEnabled ? getString(R.string.stop) : getString(R.string.draw));
             updateDrawingViewTouchability(isDrawingEnabled);
         });
 
