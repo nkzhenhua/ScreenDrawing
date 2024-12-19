@@ -104,7 +104,7 @@ public class OverlayService extends Service {
         final int[] initialY = new int[1];
         final float[] initialTouchX = new float[1];
         final float[] initialTouchY = new float[1];
-        final int EDGE_THRESHOLD = 100;
+        final int EDGE_THRESHOLD = 50;
 
         dragHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
