@@ -19,13 +19,15 @@ import android.widget.TextView;
 
 public class OverlayService extends Service {
     private static final String TAG = "OverlayService";
+    private static final String PREFS_NAME = "DrawingPrefs";
+    private static final String KEY_EINK_MODE = "isEinkMode";
     
     private WindowManager windowManager;
     private IDrawingView drawingView;
     private View menuView;
     private boolean isDrawingEnabled = false;
     private boolean isMenuCollapsed = false;
-    private boolean isEinkMode = true;
+    private boolean isEinkMode;
     private long lastClickTime = 0;
     private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
     private WindowManager.LayoutParams drawParams;
@@ -34,6 +36,10 @@ public class OverlayService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        
+        // Load saved preference
+        isEinkMode = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            .getBoolean(KEY_EINK_MODE, true);  // 默认为 true (EInk mode)
         
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         createOverlay();
@@ -49,8 +55,8 @@ public class OverlayService extends Service {
             PixelFormat.TRANSLUCENT
         );
         
-        // Initialize drawing view with EInk mode by default
-        createDrawingView(true);
+        // Initialize drawing view with saved preference
+        createDrawingView(isEinkMode);
         windowManager.addView(drawingView.asView(), drawParams);
 
         // Initialize menu
@@ -69,6 +75,11 @@ public class OverlayService extends Service {
         menuParams.y = 0;
 
         windowManager.addView(menuView, menuParams);
+        
+        // Set initial button text based on saved preference
+        Button toggleViewButton = menuView.findViewById(R.id.toggleViewButton);
+        toggleViewButton.setText(isEinkMode ? "EInk" : "NonE");
+        
         setupMenuButtons(menuParams);
     }
 
@@ -83,6 +94,12 @@ public class OverlayService extends Service {
             
             // Create new view
             isEinkMode = !isEinkMode;
+            // Save the new preference
+            getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .edit()
+                .putBoolean(KEY_EINK_MODE, isEinkMode)
+                .apply();
+            
             createDrawingView(isEinkMode);
             
             // Remove and re-add menu view to ensure it's on top
