@@ -13,18 +13,15 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-// Your custom view imports
-import com.eink.screendrawing.DrawingView;
-import com.eink.screendrawing.MainActivity;
-import com.eink.screendrawing.R;
 
 public class OverlayService extends Service {
     private static final String TAG = "OverlayService";
     
     private WindowManager windowManager;
-    private DrawingView drawingView;
+    private DrawingViewEInk drawingView;
     private View menuView;
     private boolean isDrawingEnabled = false;
     private boolean isMenuCollapsed = false;
@@ -41,7 +38,7 @@ public class OverlayService extends Service {
 
     private void createOverlay() {
         // Initialize drawing view
-        drawingView = new DrawingView(this);
+        drawingView = new DrawingViewEInk(this);
         WindowManager.LayoutParams drawParams = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -75,6 +72,26 @@ public class OverlayService extends Service {
         Button toggleButton = menuView.findViewById(R.id.toggleButton);
         Button undoButton = menuView.findViewById(R.id.undoButton);
         Button clearButton = menuView.findViewById(R.id.clearButton);
+
+        // Setup prediction time control
+        SeekBar predictionSeekBar = menuView.findViewById(R.id.predictionSeekBar);
+        TextView predictionValueText = menuView.findViewById(R.id.predictionValueText);
+        
+        predictionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (drawingView != null) {
+                    drawingView.setPredictionTime(progress);
+                    predictionValueText.setText(progress + " ms");
+                }
+            }
+            
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
         // Start with drawing disabled
         isDrawingEnabled = false;
