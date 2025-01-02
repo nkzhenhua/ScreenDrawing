@@ -13,25 +13,28 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.eink.screendrawing.prediction.TouchPoint;
+import com.eink.screendrawing.prediction.StrokePrediction;
+import com.eink.screendrawing.prediction.QuadraticPrediction;
+
 public class DrawingViewEInk extends View {
     // Constants
     private static final float STROKE_WIDTH = 5f;
     private static final int DEFAULT_COLOR = Color.BLACK;
 
     private float lastX, lastY;
+    private float lastPressure = 1.0f;
 
     private Path currentPath;
     private Path predictedPath;
     private Paint paint;
     private List<PathData> pathDataList;
-    private List<TouchData> touchHistory = new ArrayList<>();
+    
+    private List<TouchPoint> touchHistory;
+    private StrokePrediction predictor;
 
     // Prediction related constants
     private static final long HISTORY_DURATION = 5;    // 保存过去5ms的历史数据
-    private long predictionTime = 17;                   // 预测和计算速度的时间窗口(ms)
-    private static final float PREDICTION_CURVE_RATIO = 0.3f; // 贝塞尔曲线控制点比例
-
-    private float lastPressure = 1.0f;
 
     public DrawingViewEInk(Context context) {
         super(context);
@@ -55,6 +58,7 @@ public class DrawingViewEInk extends View {
         setBackgroundColor(Color.TRANSPARENT);
         
         touchHistory = new ArrayList<>();
+        predictor = new QuadraticPrediction();
     }
 
     @Override
@@ -69,53 +73,7 @@ public class DrawingViewEInk extends View {
     }
 
     private void predictPath(float x, float y, float pressure) {
-        if (touchHistory.size() < 2) return;
-        
-        long currentTime = System.currentTimeMillis();
-        long velocityThreshold = currentTime - predictionTime;
-        
-        // 获取用于计算速度的最近数据点
-        List<TouchData> velocityPoints = new ArrayList<>();
-        for (int i = touchHistory.size() - 1; i >= 0; i--) {
-            TouchData point = touchHistory.get(i);
-            if (point.timestamp >= velocityThreshold) {
-                velocityPoints.add(0, point);
-            } else {
-                break;
-            }
-        }
-        
-        if (velocityPoints.size() < 2) return;
-        
-        // 计算最近predictionTime时间内的平均速度
-        TouchData newest = velocityPoints.get(velocityPoints.size() - 1);
-        TouchData oldest = velocityPoints.get(0);
-        
-        float timeSpan = (newest.timestamp - oldest.timestamp);
-        if (timeSpan <= 0) return;
-        
-        // 计算速度向量 (像素/毫秒)
-        float vx = (newest.x - oldest.x) / timeSpan;
-        float vy = (newest.y - oldest.y) / timeSpan;
-        
-        // 预测未来predictionTime时间的位置
-        float predictedX = newest.x + vx * predictionTime;
-        float predictedY = newest.y + vy * predictionTime;
-        
-        // 创建预测路径
-        predictedPath = new Path();
-        predictedPath.moveTo(newest.x, newest.y);
-        
-        // 使用三阶贝塞尔曲线创建平滑的预测路径
-        float controlLen = predictionTime * PREDICTION_CURVE_RATIO;
-        predictedPath.cubicTo(
-            newest.x + vx * controlLen,
-            newest.y + vy * controlLen,
-            predictedX - vx * controlLen,
-            predictedY - vy * controlLen,
-            predictedX,
-            predictedY
-        );
+        predictedPath = predictor.predictStroke(touchHistory);
     }
 
     @Override
@@ -140,14 +98,14 @@ public class DrawingViewEInk extends View {
                 lastX = x;
                 lastY = y;
                 touchHistory.clear();
-                touchHistory.add(new TouchData(x, y, pressure, System.currentTimeMillis()));
+                touchHistory.add(new TouchPoint(x, y, pressure, System.currentTimeMillis()));
                 predictedPath = null;
                 invalidate();
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 long currentTime = System.currentTimeMillis();
-                TouchData newTouch = new TouchData(x, y, pressure, currentTime);
+                TouchPoint newTouch = new TouchPoint(x, y, pressure, currentTime);
                 touchHistory.add(newTouch);
                 
                 // 只保留最近HISTORY_DURATION时间内的历史数据
@@ -218,6 +176,12 @@ public class DrawingViewEInk extends View {
     }
 
     public void setPredictionTime(long ms) {
-        this.predictionTime = ms;
+        if (predictor != null) {
+            predictor.setPredictionTime(ms);  // 更新预测器中的时间
+        }
+    }
+
+    public void setPredictionAlgorithm(StrokePrediction predictor) {
+        this.predictor = predictor;
     }
 }
