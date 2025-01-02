@@ -17,7 +17,7 @@ import com.eink.screendrawing.prediction.TouchPoint;
 import com.eink.screendrawing.prediction.StrokePrediction;
 import com.eink.screendrawing.prediction.QuadraticPrediction;
 
-public class DrawingViewEInk extends View {
+public class DrawingViewEInk extends View implements IDrawingView {
     // Constants
     private static final float STROKE_WIDTH = 5f;
     private static final int DEFAULT_COLOR = Color.BLACK;
@@ -183,5 +183,10 @@ public class DrawingViewEInk extends View {
 
     public void setPredictionAlgorithm(StrokePrediction predictor) {
         this.predictor = predictor;
+    }
+
+    @Override
+    public View asView() {
+        return this;
     }
 }

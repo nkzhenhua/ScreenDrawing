@@ -21,12 +21,15 @@ public class OverlayService extends Service {
     private static final String TAG = "OverlayService";
     
     private WindowManager windowManager;
-    private DrawingViewEInk drawingView;
+    private IDrawingView drawingView;
     private View menuView;
     private boolean isDrawingEnabled = false;
     private boolean isMenuCollapsed = false;
+    private boolean isEinkMode = true;
     private long lastClickTime = 0;
     private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
+    private WindowManager.LayoutParams drawParams;
+    private WindowManager.LayoutParams menuParams;
 
     @Override
     public void onCreate() {
@@ -37,22 +40,24 @@ public class OverlayService extends Service {
     }
 
     private void createOverlay() {
-        // Initialize drawing view
-        drawingView = new DrawingViewEInk(this);
-        WindowManager.LayoutParams drawParams = new WindowManager.LayoutParams(
+        // Create window parameters
+        drawParams = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         );
-        windowManager.addView(drawingView, drawParams);
+        
+        // Initialize drawing view with EInk mode by default
+        createDrawingView(true);
+        windowManager.addView(drawingView.asView(), drawParams);
 
         // Initialize menu
         LayoutInflater inflater = LayoutInflater.from(this);
         menuView = inflater.inflate(R.layout.floating_menu, null);
 
-        WindowManager.LayoutParams menuParams = new WindowManager.LayoutParams(
+        menuParams = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -67,11 +72,42 @@ public class OverlayService extends Service {
         setupMenuButtons(menuParams);
     }
 
+    private void createDrawingView(boolean eInkMode) {
+        drawingView = eInkMode ? new DrawingViewEInk(this) : new DrawingView(this);
+    }
+
+    private void switchDrawingView() {
+        if (drawingView != null) {
+            // Remove old view
+            windowManager.removeView(drawingView.asView());
+            
+            // Create new view
+            isEinkMode = !isEinkMode;
+            createDrawingView(isEinkMode);
+            
+            // Remove and re-add menu view to ensure it's on top
+            windowManager.removeView(menuView);
+            
+            // Add new view
+            windowManager.addView(drawingView.asView(), drawParams);
+            windowManager.addView(menuView, menuParams);  // Re-add menu on top
+            
+            // Update button text
+            Button toggleViewButton = menuView.findViewById(R.id.toggleViewButton);
+            toggleViewButton.setText(isEinkMode ? "EInk" : "NonE");
+            
+            // Maintain enabled state
+            drawingView.setEnabled(isDrawingEnabled);
+            updateDrawingViewTouchability(isDrawingEnabled);
+        }
+    }
+
     private void setupMenuButtons(final WindowManager.LayoutParams menuParams) {
         Button exitButton = menuView.findViewById(R.id.exitButton);
         Button toggleButton = menuView.findViewById(R.id.toggleButton);
         Button undoButton = menuView.findViewById(R.id.undoButton);
         Button clearButton = menuView.findViewById(R.id.clearButton);
+        Button toggleViewButton = menuView.findViewById(R.id.toggleViewButton);
 
         // Setup prediction time control
         SeekBar predictionSeekBar = menuView.findViewById(R.id.predictionSeekBar);
@@ -110,6 +146,9 @@ public class OverlayService extends Service {
 
         undoButton.setOnClickListener(v -> drawingView.undo());
         clearButton.setOnClickListener(v -> drawingView.clearCanvas());
+
+        // Setup view toggle button
+        toggleViewButton.setOnClickListener(v -> switchDrawingView());
 
         setupDragHandle(menuParams);
     }
@@ -186,13 +225,13 @@ public class OverlayService extends Service {
     }
 
     private void updateDrawingViewTouchability(boolean enabled) {
-        WindowManager.LayoutParams params = (WindowManager.LayoutParams) drawingView.getLayoutParams();
+        WindowManager.LayoutParams params = (WindowManager.LayoutParams) drawingView.asView().getLayoutParams();
         if (enabled) {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         } else {
             params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         }
-        windowManager.updateViewLayout(drawingView, params);
+        windowManager.updateViewLayout(drawingView.asView(), params);
     }
 
     @Override
@@ -211,7 +250,7 @@ public class OverlayService extends Service {
         if (windowManager != null) {
             if (drawingView != null) {
                 try {
-                    windowManager.removeView(drawingView);
+                    windowManager.removeView(drawingView.asView());
                 } catch (IllegalArgumentException e) {
                     Log.e(TAG, "Error removing drawing view: " + e.getMessage());
                 }
@@ -228,17 +267,17 @@ public class OverlayService extends Service {
     private void toggleMenuButtons() {
         isMenuCollapsed = !isMenuCollapsed;
 
-        // Find all buttons in the menu
         Button exitButton = menuView.findViewById(R.id.exitButton);
         Button toggleButton = menuView.findViewById(R.id.toggleButton);
         Button undoButton = menuView.findViewById(R.id.undoButton);
         Button clearButton = menuView.findViewById(R.id.clearButton);
+        Button toggleViewButton = menuView.findViewById(R.id.toggleViewButton);
 
-        // Set visibility for all buttons
         int visibility = isMenuCollapsed ? View.GONE : View.VISIBLE;
         exitButton.setVisibility(visibility);
         toggleButton.setVisibility(visibility);
         undoButton.setVisibility(visibility);
         clearButton.setVisibility(visibility);
+        toggleViewButton.setVisibility(visibility);
     }
 }

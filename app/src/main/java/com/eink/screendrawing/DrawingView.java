@@ -10,9 +10,10 @@ import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.eink.screendrawing.prediction.StrokePrediction;
 
 // ... other imports
-public class DrawingView extends View {
+public class DrawingView extends View implements IDrawingView {
     // Constants
     private static final float STROKE_WIDTH = 5f;
     private static final int DEFAULT_COLOR = Color.BLACK;
@@ -115,5 +116,20 @@ public class DrawingView extends View {
     
     public void setColor(int color) {
         paint.setColor(color);
+    }
+
+    @Override
+    public void setPredictionTime(long ms) {
+        // 普通DrawingView不需要实现预测功能
+    }
+
+    @Override
+    public void setPredictionAlgorithm(StrokePrediction predictor) {
+        // 普通DrawingView不需要实现预测功能
+    }
+
+    @Override
+    public View asView() {
+        return this;
     }
 }
