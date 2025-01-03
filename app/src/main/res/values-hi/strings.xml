@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">स्क्रीनड्रा</string>
+    <string name="stop">✎ बंद करें</string>
+    <string name="draw">✎ बनाएं</string>
+    <string name="undo">↶ पूर्ववत करें</string>
+    <string name="clear">⌧ साफ़ करें</string>
+    <string name="exit">✕ बाहर निकलें</string>
+</resources>

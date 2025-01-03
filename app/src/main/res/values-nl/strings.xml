@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ScreenDraw</string>
+    <string name="stop">✎ STOP</string>
+    <string name="draw">✎ TEKEN</string>
+    <string name="undo">↶ ONGEDAAN MAKEN</string>
+    <string name="clear">⌧ WISSEN</string>
+    <string name="exit">✕ AFSLUITEN</string>
+</resources>
