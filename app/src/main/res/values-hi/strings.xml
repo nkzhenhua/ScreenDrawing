@@ -5,4 +5,5 @@
     <string name="undo">↶ पूर्ववत करें</string>
     <string name="clear">⌧ साफ़ करें</string>
     <string name="exit">✕ बाहर निकलें</string>
+    <string name="grantPermissionMsg">फ़ाइल %s सफलतापूर्वक सहेजी गई</string>
 </resources>

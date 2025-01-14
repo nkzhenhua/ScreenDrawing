@@ -162,9 +162,9 @@ public class OverlayService extends Service {
     private void updateDragHandleForOrientation(boolean isVertical) {
         TextView dragHandleText = menuView.findViewById(R.id.dragHandleText);
         if (isVertical) {
-            dragHandleText.setText("⠿ ⠿ ⠿"); // Three groups for vertical
+            dragHandleText.setText(getString(R.string.dragHandleTextV));
         } else {
-            dragHandleText.setText("⠿ ⠿"); // Two groups for horizontal
+            dragHandleText.setText(getString(R.string.dragHandleTextH));
         }
     }
 

@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         
         if (!Settings.canDrawOverlays(this)) {
-            Toast.makeText(this, "Please grant overlay permission", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.grantPermissionMsg, Toast.LENGTH_LONG).show();
             Intent intent = new Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + getPackageName())

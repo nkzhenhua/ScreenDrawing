@@ -5,4 +5,7 @@
     <string name="undo">↶ UNDO</string>
     <string name="clear">⌧ CLEAR</string>
     <string name="exit">✕ EXIT</string>
+    <string name="dragHandleTextV" translatable="false">⠿ ⠿ ⠿</string>
+    <string name="dragHandleTextH" translatable="false">⠿ ⠿</string>
+    <string name="grantPermissionMsg">Please grant overlay permission</string>
 </resources>

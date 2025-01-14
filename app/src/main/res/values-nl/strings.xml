@@ -5,4 +5,5 @@
     <string name="undo">↶ ONGEDAAN MAKEN</string>
     <string name="clear">⌧ WISSEN</string>
     <string name="exit">✕ AFSLUITEN</string>
+    <string name="grantPermissionMsg">Bestand %s succesvol opgeslagen</string>
 </resources>
