@@ -5,4 +5,5 @@
     <string name="undo">撤销</string>
     <string name="clear">清屏</string>
     <string name="exit">退出</string>
+    <string name="grantPermissionMsg">请授予悬浮窗权限</string>
 </resources>
