@@ -30,29 +30,29 @@
 
     <Button
         android:id="@+id/exitButton"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_margin="1dp"
         android:text="@string/exit" />
 
     <Button
         android:id="@+id/toggleButton"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_margin="1dp"
         android:text="@string/draw" />
 
     <Button
         android:id="@+id/undoButton"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_margin="1dp"
         android:text="@string/undo" />
 
     <Button
         android:id="@+id/clearButton"
-        android:layout_width="90dp"
-        android:layout_height="40dp"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
         android:layout_margin="1dp"
         android:text="@string/clear" />
 
