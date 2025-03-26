@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">屏幕写画</string>
-    <string name="stop">禁止</string>
-    <string name="draw">写画</string>
-    <string name="undo">撤销</string>
-    <string name="clear">清屏</string>
-    <string name="exit">退出</string>
+    <string name="stop">✎禁止</string>
+    <string name="draw">✎写画</string>
+    <string name="undo">↶撤销</string>
+    <string name="clear">⌧清屏</string>
+    <string name="exit">✕退出</string>
     <string name="grantPermissionMsg">请授予悬浮窗权限</string>
 </resources>
