@@ -21,7 +21,7 @@
             android:id="@+id/dragHandleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⠿ ⠿ ⠿"
+            android:text="@string/dragHandleTextV"
             android:textColor="#000000"
             android:textStyle="bold"
             android:textSize="14sp"
@@ -47,13 +47,15 @@
         android:layout_width="90dp"
         android:layout_height="50dp"
         android:layout_margin="1dp"
-        android:text="@string/undo" />
+        android:text="@string/undo"
+        android:contentDescription="@string/undo_description" />
 
     <Button
         android:id="@+id/clearButton"
         android:layout_width="90dp"
         android:layout_height="50dp"
         android:layout_margin="1dp"
-        android:text="@string/clear" />
+        android:text="@string/clear"
+        android:contentDescription="@string/cls_description"/>
 
 </LinearLayout>
