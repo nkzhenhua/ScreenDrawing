@@ -6,7 +6,13 @@ A native Android drawing app that lets you draw anywhere on your screen, even on
 Screen Draw runs as an overlay service, providing a transparent canvas across your entire screen. The floating menu contains essential controls while keeping the interface clean and unobtrusive.
 It is designed for Eink android reader device, such as BOOX brand and tested on boox tab13 with android11
 ![App Icon](app/src/main/ic_launcher-playstore.png)
-download the apk in https://github.com/nkzhenhua/ScreenDrawing/releases/tag/1.1.2
+
+## download
+### github:
+https://github.com/nkzhenhua/ScreenDrawing/releases/tag/1.1.2
+### google play:
+https://play.google.com/store/apps/details?id=com.eink.screendrawing
+
 
 ## Features
 - Draw freely anywhere on your screen or on top of other applications

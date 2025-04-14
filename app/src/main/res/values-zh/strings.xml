@@ -6,4 +6,6 @@
     <string name="clear">⌧清屏</string>
     <string name="exit">✕退出</string>
     <string name="grantPermissionMsg">请授予悬浮窗权限</string>
+    <string name="undo_description">回撤上次笔画</string>
+    <string name="cls_description">清除屏幕所有笔画</string>
 </resources>

@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">ScreenDraw</string>
-    <string name="stop">✎ STOP</string>
-    <string name="draw">✎ DRAW</string>">
-    <string name="undo">↶ UNDO</string>
-    <string name="clear">⌧ CLEAR</string>
-    <string name="exit">✕ EXIT</string>
+    <string name="stop">✎STOP</string>
+    <string name="draw">✎DRAW</string>">
+    <string name="undo">↶UNDO</string>
+    <string name="clear">⌧CLS</string>
+    <string name="exit">✕EXIT</string>
     <string name="dragHandleTextV" translatable="false">⠿ ⠿ ⠿</string>
     <string name="dragHandleTextH" translatable="false">⠿ ⠿</string>
     <string name="grantPermissionMsg">Please grant overlay permission</string>
+    <string name="undo_description">Undo the last drawing action</string>
+    <string name="cls_description">Clear all the drawings on the whole screen </string>
 </resources>
