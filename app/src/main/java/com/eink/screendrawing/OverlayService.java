@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.os.IBinder;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,6 +15,8 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import androidx.core.content.ContextCompat;
 
 // Your custom view imports
 import com.eink.screendrawing.DrawingView;
@@ -116,22 +117,20 @@ public class OverlayService extends Service {
         if (isOn) {
             // 开启状态：蓝色背景 + 白色图标
             btnDraw.setBackgroundResource(R.drawable.bg_active_brush);
-            iconDraw.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+            iconDraw.setColorFilter(ContextCompat.getColor(this, R.color.icon_default_tint), PorterDuff.Mode.SRC_IN);
         } else {
             // 关闭状态：无背景 + 灰色图标
             btnDraw.setBackgroundResource(android.R.color.transparent);
-            iconDraw.setColorFilter(Color.parseColor("#AAAAAA"), PorterDuff.Mode.SRC_IN);
+            iconDraw.setColorFilter(ContextCompat.getColor(this, R.color.icon_disabled_tint), PorterDuff.Mode.SRC_IN);
         }
     }
 
     private void setupDragHandle(final WindowManager.LayoutParams menuParams) {
         View dragHandle = menuView.findViewById(R.id.dragHandle);
-        final LinearLayout menuLayout = (LinearLayout) menuView;
         final int[] initialX = new int[1];
         final int[] initialY = new int[1];
         final float[] initialTouchX = new float[1];
         final float[] initialTouchY = new float[1];
-        final int EDGE_THRESHOLD = 100;
 
         dragHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -159,22 +158,6 @@ public class OverlayService extends Service {
                         if (System.currentTimeMillis() - lastClickTime > 100) {
                             menuParams.x = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
                             menuParams.y = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
-
-                            // Rest of your existing drag code...
-                            DisplayMetrics metrics = getResources().getDisplayMetrics();
-                            int screenWidth = metrics.widthPixels;
-                            int screenHeight = metrics.heightPixels;
-
-                            if (menuParams.x < EDGE_THRESHOLD || screenWidth - menuParams.x < EDGE_THRESHOLD) {
-                                if (menuLayout.getOrientation() != LinearLayout.VERTICAL) {
-                                    menuLayout.setOrientation(LinearLayout.VERTICAL);
-                                }
-                            } else if (menuParams.y < EDGE_THRESHOLD || screenHeight - menuParams.y < EDGE_THRESHOLD) {
-                                if (menuLayout.getOrientation() != LinearLayout.HORIZONTAL) {
-                                    menuLayout.setOrientation(LinearLayout.HORIZONTAL);
-                                }
-                            }
-
                             windowManager.updateViewLayout(menuView, menuParams);
                         }
                         return true;

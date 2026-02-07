@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Floating Menu Dimensions -->
+    <dimen name="floating_menu_width">60dp</dimen>
+    <dimen name="floating_menu_corner_radius">30dp</dimen>
+    <dimen name="floating_menu_elevation">8dp</dimen>
+    <dimen name="floating_menu_padding_bottom">16dp</dimen>
+
+    <!-- Drag Handle -->
+    <dimen name="drag_handle_width">24dp</dimen>
+    <dimen name="drag_handle_height">4dp</dimen>
+    <dimen name="drag_handle_margin_top">12dp</dimen>
+    <dimen name="drag_handle_margin_bottom">12dp</dimen>
+
+    <!-- Menu Buttons -->
+    <dimen name="menu_button_size">48dp</dimen>
+    <dimen name="menu_button_margin_top">8dp</dimen>
+    <dimen name="menu_icon_size">24dp</dimen>
+
+    <!-- Active Brush Background -->
+    <dimen name="active_brush_size">40dp</dimen>
+</resources>

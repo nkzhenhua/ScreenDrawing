@@ -2,34 +2,34 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/menuContainer"
-    android:layout_width="60dp"
+    android:layout_width="@dimen/floating_menu_width"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/bg_menu_container"
     android:gravity="center_horizontal"
-    android:elevation="8dp"
-    android:paddingBottom="16dp">
+    android:elevation="@dimen/floating_menu_elevation"
+    android:paddingBottom="@dimen/floating_menu_padding_bottom">
 
     <!-- 顶部拖动手柄 -->
     <View
         android:id="@+id/dragHandle"
-        android:layout_width="24dp"
-        android:layout_height="4dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        android:background="#66FFFFFF" />
+        android:layout_width="@dimen/drag_handle_width"
+        android:layout_height="@dimen/drag_handle_height"
+        android:layout_marginTop="@dimen/drag_handle_margin_top"
+        android:layout_marginBottom="@dimen/drag_handle_margin_bottom"
+        android:background="@color/menu_drag_handle" />
 
     <!-- 1. 绘图模式开关 (画笔) -->
     <FrameLayout
         android:id="@+id/btnDraw"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="@dimen/menu_button_size"
+        android:layout_height="@dimen/menu_button_size"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
             android:id="@+id/iconDraw"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/menu_icon_size"
+            android:layout_height="@dimen/menu_icon_size"
             android:layout_gravity="center"
             android:src="@drawable/ic_edit"
             android:contentDescription="@string/draw" />
@@ -38,15 +38,15 @@
     <!-- 2. 撤销 (Undo) -->
     <FrameLayout
         android:id="@+id/btnUndo"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="@dimen/menu_button_size"
+        android:layout_height="@dimen/menu_button_size"
+        android:layout_marginTop="@dimen/menu_button_margin_top"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
             android:id="@+id/iconUndo"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/menu_icon_size"
+            android:layout_height="@dimen/menu_icon_size"
             android:layout_gravity="center"
             android:src="@drawable/ic_undo"
             android:contentDescription="@string/undo" />
@@ -55,15 +55,15 @@
     <!-- 3. 清空屏幕 (垃圾桶) -->
     <FrameLayout
         android:id="@+id/btnClear"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="@dimen/menu_button_size"
+        android:layout_height="@dimen/menu_button_size"
+        android:layout_marginTop="@dimen/menu_button_margin_top"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
             android:id="@+id/iconClear"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/menu_icon_size"
+            android:layout_height="@dimen/menu_icon_size"
             android:layout_gravity="center"
             android:src="@drawable/ic_delete"
             android:contentDescription="@string/clear" />
@@ -72,15 +72,15 @@
     <!-- 4. 退出 (电源) -->
     <FrameLayout
         android:id="@+id/btnExit"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="@dimen/menu_button_size"
+        android:layout_height="@dimen/menu_button_size"
+        android:layout_marginTop="@dimen/menu_button_margin_top"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
             android:id="@+id/iconExit"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/menu_icon_size"
+            android:layout_height="@dimen/menu_icon_size"
             android:layout_gravity="center"
             android:src="@drawable/ic_power"
             android:contentDescription="@string/exit" />

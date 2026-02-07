@@ -2,9 +2,9 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <!-- 蓝色背景 -->
-    <solid android:color="#2196F3" />
+    <solid android:color="@color/accent_blue" />
     <!-- 固定大小 -->
     <size
-        android:width="40dp"
-        android:height="40dp" />
+        android:width="@dimen/active_brush_size"
+        android:height="@dimen/active_brush_size" />
 </shape>
