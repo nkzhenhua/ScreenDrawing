@@ -10,7 +10,7 @@ It is designed for Eink android reader device, such as BOOX brand and tested on 
 
 ## Download
 ### GitHub:
-https://github.com/nkzhenhua/ScreenDrawing/releases/tag/1.1.7
+https://github.com/nkzhenhua/ScreenDrawing/releases/tag/1.1.9
 
 ### Google Play:
 https://play.google.com/store/apps/details?id=com.eink.screendrawing
