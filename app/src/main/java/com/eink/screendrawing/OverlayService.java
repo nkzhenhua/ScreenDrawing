@@ -41,6 +41,7 @@ public class OverlayService extends Service {
     private FrameLayout btnUndo;
     private FrameLayout btnClear;
     private FrameLayout btnExit;
+    private View dividerView;
 
     @Override
     public void onCreate() {
@@ -63,7 +64,8 @@ public class OverlayService extends Service {
         windowManager.addView(drawingView, drawParams);
 
         // Initialize menu
-        LayoutInflater inflater = LayoutInflater.from(this);
+        android.view.ContextThemeWrapper themeContext = new android.view.ContextThemeWrapper(this, R.style.Theme_ScreenDrawing);
+        LayoutInflater inflater = LayoutInflater.from(themeContext);
         menuView = inflater.inflate(R.layout.floating_menu, null);
 
         WindowManager.LayoutParams menuParams = new WindowManager.LayoutParams(
@@ -88,6 +90,7 @@ public class OverlayService extends Service {
         btnUndo = menuView.findViewById(R.id.btnUndo);
         btnClear = menuView.findViewById(R.id.btnClear);
         btnExit = menuView.findViewById(R.id.btnExit);
+        dividerView = menuView.findViewById(R.id.dividerView);
 
         // Start with drawing disabled
         isDrawingEnabled = false;
@@ -161,6 +164,9 @@ public class OverlayService extends Service {
                             windowManager.updateViewLayout(menuView, menuParams);
                         }
                         return true;
+
+                    case MotionEvent.ACTION_UP:
+                        return true;
                 }
                 return false;
             }
@@ -217,5 +223,8 @@ public class OverlayService extends Service {
         btnUndo.setVisibility(visibility);
         btnClear.setVisibility(visibility);
         btnExit.setVisibility(visibility);
+        if (dividerView != null) {
+            dividerView.setVisibility(visibility);
+        }
     }
 }

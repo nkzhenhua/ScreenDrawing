@@ -10,14 +10,32 @@
     android:elevation="@dimen/floating_menu_elevation"
     android:paddingBottom="@dimen/floating_menu_padding_bottom">
 
-    <!-- 顶部拖动手柄 -->
-    <View
+    <!-- 顶部拖动手柄 (增加点击热区) -->
+    <FrameLayout
         android:id="@+id/dragHandle"
-        android:layout_width="@dimen/drag_handle_width"
-        android:layout_height="@dimen/drag_handle_height"
-        android:layout_marginTop="@dimen/drag_handle_margin_top"
-        android:layout_marginBottom="@dimen/drag_handle_margin_bottom"
-        android:background="@color/menu_drag_handle" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <View
+                android:layout_width="@dimen/drag_handle_width"
+                android:layout_height="3dp"
+                android:background="@drawable/bg_drag_line" />
+
+            <View
+                android:layout_width="@dimen/drag_handle_width"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_drag_line" />
+        </LinearLayout>
+    </FrameLayout>
 
     <!-- 1. 绘图模式开关 (画笔) -->
     <FrameLayout
@@ -40,7 +58,7 @@
         android:id="@+id/btnUndo"
         android:layout_width="@dimen/menu_button_size"
         android:layout_height="@dimen/menu_button_size"
-        android:layout_marginTop="@dimen/menu_button_margin_top"
+        android:layout_marginTop="16dp"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
@@ -69,12 +87,20 @@
             android:contentDescription="@string/clear" />
     </FrameLayout>
 
+    <!-- 分割线 -->
+    <View
+        android:id="@+id/dividerView"
+        android:layout_width="32dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="#33FFFFFF" />
+
     <!-- 4. 退出 (电源) -->
     <FrameLayout
         android:id="@+id/btnExit"
         android:layout_width="@dimen/menu_button_size"
         android:layout_height="@dimen/menu_button_size"
-        android:layout_marginTop="@dimen/menu_button_margin_top"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
@@ -83,6 +109,7 @@
             android:layout_height="@dimen/menu_icon_size"
             android:layout_gravity="center"
             android:src="@drawable/ic_power"
+            android:tint="@color/accent_red"
             android:contentDescription="@string/exit" />
     </FrameLayout>
 

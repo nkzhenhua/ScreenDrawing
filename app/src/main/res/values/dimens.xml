@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Floating Menu Dimensions -->
-    <dimen name="floating_menu_width">60dp</dimen>
-    <dimen name="floating_menu_corner_radius">30dp</dimen>
+    <dimen name="floating_menu_width">72dp</dimen>
+    <dimen name="floating_menu_corner_radius">36dp</dimen>
     <dimen name="floating_menu_elevation">8dp</dimen>
     <dimen name="floating_menu_padding_bottom">16dp</dimen>
 
@@ -18,5 +18,5 @@
     <dimen name="menu_icon_size">24dp</dimen>
 
     <!-- Active Brush Background -->
-    <dimen name="active_brush_size">40dp</dimen>
+    <dimen name="active_brush_size">48dp</dimen>
 </resources>
