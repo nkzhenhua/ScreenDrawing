@@ -2,18 +2,21 @@ package com.eink.screendrawing;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.os.IBinder;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 // Your custom view imports
 import com.eink.screendrawing.DrawingView;
@@ -21,8 +24,9 @@ import com.eink.screendrawing.MainActivity;
 import com.eink.screendrawing.R;
 
 public class OverlayService extends Service {
+
     private static final String TAG = "OverlayService";
-    
+
     private WindowManager windowManager;
     private DrawingView drawingView;
     private View menuView;
@@ -31,10 +35,18 @@ public class OverlayService extends Service {
     private long lastClickTime = 0;
     private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
 
+    // UI 元素引用
+    private FrameLayout btnDraw;
+    private ImageView iconDraw;
+    private FrameLayout btnUndo;
+    private FrameLayout btnClear;
+    private FrameLayout btnExit;
+    private View dividerView;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         createOverlay();
     }
@@ -43,24 +55,25 @@ public class OverlayService extends Service {
         // Initialize drawing view
         drawingView = new DrawingView(this);
         WindowManager.LayoutParams drawParams = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
         );
         windowManager.addView(drawingView, drawParams);
 
         // Initialize menu
-        LayoutInflater inflater = LayoutInflater.from(this);
+        android.view.ContextThemeWrapper themeContext = new android.view.ContextThemeWrapper(this, R.style.Theme_ScreenDrawing);
+        LayoutInflater inflater = LayoutInflater.from(themeContext);
         menuView = inflater.inflate(R.layout.floating_menu, null);
 
         WindowManager.LayoutParams menuParams = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSLUCENT
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
         );
         menuParams.gravity = Gravity.TOP | Gravity.LEFT;
         menuParams.x = 0;
@@ -71,40 +84,56 @@ public class OverlayService extends Service {
     }
 
     private void setupMenuButtons(final WindowManager.LayoutParams menuParams) {
-        Button exitButton = menuView.findViewById(R.id.exitButton);
-        Button toggleButton = menuView.findViewById(R.id.toggleButton);
-        Button undoButton = menuView.findViewById(R.id.undoButton);
-        Button clearButton = menuView.findViewById(R.id.clearButton);
+        // 获取新的 UI 元素引用
+        btnDraw = menuView.findViewById(R.id.btnDraw);
+        iconDraw = menuView.findViewById(R.id.iconDraw);
+        btnUndo = menuView.findViewById(R.id.btnUndo);
+        btnClear = menuView.findViewById(R.id.btnClear);
+        btnExit = menuView.findViewById(R.id.btnExit);
+        dividerView = menuView.findViewById(R.id.dividerView);
 
         // Start with drawing disabled
         isDrawingEnabled = false;
         drawingView.setEnabled(isDrawingEnabled);
         updateDrawingViewTouchability(isDrawingEnabled);
-        toggleButton.setText(isDrawingEnabled ? getString(R.string.stop) : getString(R.string.draw));
+        setDrawingMode(isDrawingEnabled);
 
-        exitButton.setOnClickListener(v -> stopSelf());
+        btnExit.setOnClickListener(v -> stopSelf());
 
-        toggleButton.setOnClickListener(v -> {
+        btnDraw.setOnClickListener(v -> {
             isDrawingEnabled = !isDrawingEnabled;
             drawingView.setEnabled(isDrawingEnabled);
-            toggleButton.setText(isDrawingEnabled ? getString(R.string.stop) : getString(R.string.draw));
+            setDrawingMode(isDrawingEnabled);
             updateDrawingViewTouchability(isDrawingEnabled);
         });
 
-        undoButton.setOnClickListener(v -> drawingView.undo());
-        clearButton.setOnClickListener(v -> drawingView.clearCanvas());
+        btnUndo.setOnClickListener(v -> drawingView.undo());
+        btnClear.setOnClickListener(v -> drawingView.clearCanvas());
 
         setupDragHandle(menuParams);
     }
 
+    /**
+     * 设置画笔按钮的激活/非激活外观
+     */
+    private void setDrawingMode(boolean isOn) {
+        if (isOn) {
+            // 开启状态：蓝色背景 + 白色图标
+            btnDraw.setBackgroundResource(R.drawable.bg_active_brush);
+            iconDraw.setColorFilter(ContextCompat.getColor(this, R.color.icon_default_tint), PorterDuff.Mode.SRC_IN);
+        } else {
+            // 关闭状态：无背景 + 灰色图标
+            btnDraw.setBackgroundResource(android.R.color.transparent);
+            iconDraw.setColorFilter(ContextCompat.getColor(this, R.color.icon_disabled_tint), PorterDuff.Mode.SRC_IN);
+        }
+    }
+
     private void setupDragHandle(final WindowManager.LayoutParams menuParams) {
         View dragHandle = menuView.findViewById(R.id.dragHandle);
-        final LinearLayout menuLayout = (LinearLayout) menuView;
         final int[] initialX = new int[1];
         final int[] initialY = new int[1];
         final float[] initialTouchX = new float[1];
         final float[] initialTouchY = new float[1];
-        final int EDGE_THRESHOLD = 100;
 
         dragHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -132,40 +161,16 @@ public class OverlayService extends Service {
                         if (System.currentTimeMillis() - lastClickTime > 100) {
                             menuParams.x = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
                             menuParams.y = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
-
-                            // Rest of your existing drag code...
-                            DisplayMetrics metrics = getResources().getDisplayMetrics();
-                            int screenWidth = metrics.widthPixels;
-                            int screenHeight = metrics.heightPixels;
-
-                            if (menuParams.x < EDGE_THRESHOLD || screenWidth - menuParams.x < EDGE_THRESHOLD) {
-                                if (menuLayout.getOrientation() != LinearLayout.VERTICAL) {
-                                    menuLayout.setOrientation(LinearLayout.VERTICAL);
-                                    updateDragHandleForOrientation(true);
-                                }
-                            } else if (menuParams.y < EDGE_THRESHOLD || screenHeight - menuParams.y < EDGE_THRESHOLD) {
-                                if (menuLayout.getOrientation() != LinearLayout.HORIZONTAL) {
-                                    menuLayout.setOrientation(LinearLayout.HORIZONTAL);
-                                    updateDragHandleForOrientation(false);
-                                }
-                            }
-
                             windowManager.updateViewLayout(menuView, menuParams);
                         }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
                         return true;
                 }
                 return false;
             }
         });
-    }
-
-    private void updateDragHandleForOrientation(boolean isVertical) {
-        TextView dragHandleText = menuView.findViewById(R.id.dragHandleText);
-        if (isVertical) {
-            dragHandleText.setText(getString(R.string.dragHandleTextV));
-        } else {
-            dragHandleText.setText(getString(R.string.dragHandleTextH));
-        }
     }
 
     private void updateDrawingViewTouchability(boolean enabled) {
@@ -208,20 +213,18 @@ public class OverlayService extends Service {
             }
         }
     }
+
     private void toggleMenuButtons() {
         isMenuCollapsed = !isMenuCollapsed;
 
-        // Find all buttons in the menu
-        Button exitButton = menuView.findViewById(R.id.exitButton);
-        Button toggleButton = menuView.findViewById(R.id.toggleButton);
-        Button undoButton = menuView.findViewById(R.id.undoButton);
-        Button clearButton = menuView.findViewById(R.id.clearButton);
-
         // Set visibility for all buttons
         int visibility = isMenuCollapsed ? View.GONE : View.VISIBLE;
-        exitButton.setVisibility(visibility);
-        toggleButton.setVisibility(visibility);
-        undoButton.setVisibility(visibility);
-        clearButton.setVisibility(visibility);
+        btnDraw.setVisibility(visibility);
+        btnUndo.setVisibility(visibility);
+        btnClear.setVisibility(visibility);
+        btnExit.setVisibility(visibility);
+        if (dividerView != null) {
+            dividerView.setVisibility(visibility);
+        }
     }
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- 蓝色背景 -->
+    <solid android:color="@color/accent_blue" />
+    <!-- 固定大小 -->
+    <size
+        android:width="@dimen/active_brush_size"
+        android:height="@dimen/active_brush_size" />
+</shape>

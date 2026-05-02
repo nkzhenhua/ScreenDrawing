@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Floating Menu Colors -->
+    <color name="menu_background">#CC222222</color>
+    <color name="menu_drag_handle">#66FFFFFF</color>
+    <color name="icon_default_tint">#FFFFFF</color>
+    <color name="icon_disabled_tint">#AAAAAA</color>
+    <color name="accent_blue">#2196F3</color>
+    <color name="accent_red">#EF5350</color>
 </resources>
