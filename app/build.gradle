@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.eink.screendrawing'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.eink.screendrawing"
@@ -42,5 +42,5 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
-    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.core:core:1.15.0'
 }
