@@ -58,7 +58,7 @@
         android:id="@+id/btnUndo"
         android:layout_width="@dimen/menu_button_size"
         android:layout_height="@dimen/menu_button_size"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/menu_button_margin_top"
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
@@ -92,8 +92,8 @@
         android:id="@+id/dividerView"
         android:layout_width="32dp"
         android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
         android:background="#33FFFFFF" />
 
     <!-- 4. 退出 (电源) -->
