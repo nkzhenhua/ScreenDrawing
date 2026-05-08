@@ -17,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 // Your custom view imports
 import com.eink.screendrawing.DrawingView;
@@ -90,6 +93,25 @@ public class OverlayService extends Service {
         menuParams.y = 0;
 
         windowManager.addView(menuView, menuParams);
+
+        // 处理状态栏避让：将系统栏高度应用为菜单顶部内边距
+        // 这样即使菜单窗口在 y=0 处，交互区域（手柄）也会避开系统状态栏的触摸拦截区
+        int initialPaddingTop = menuView.getPaddingTop();
+        int initialPaddingBottom = menuView.getPaddingBottom();
+        int initialPaddingLeft = menuView.getPaddingLeft();
+        int initialPaddingRight = menuView.getPaddingRight();
+
+        ViewCompat.setOnApplyWindowInsetsListener(menuView, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(
+                initialPaddingLeft + systemBars.left,
+                initialPaddingTop + systemBars.top,
+                initialPaddingRight + systemBars.right,
+                initialPaddingBottom + systemBars.bottom
+            );
+            return insets;
+        });
+
         setupMenuButtons(menuParams);
     }
 
