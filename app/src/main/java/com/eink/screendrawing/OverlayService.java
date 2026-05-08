@@ -101,6 +101,8 @@ public class OverlayService extends Service {
         int initialPaddingLeft = menuView.getPaddingLeft();
         int initialPaddingRight = menuView.getPaddingRight();
 
+        // 处理状态栏避让：将系统栏高度应用为菜单顶部内边距
+        // 只要菜单不超出屏幕边缘，Insets 就会保持稳定
         ViewCompat.setOnApplyWindowInsetsListener(menuView, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(
@@ -167,6 +169,21 @@ public class OverlayService extends Service {
         final float[] initialTouchX = new float[1];
         final float[] initialTouchY = new float[1];
 
+        // 获取屏幕尺寸用于边界限制
+        final int screenWidth;
+        final int screenHeight;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            android.view.WindowMetrics windowMetrics = windowManager.getCurrentWindowMetrics();
+            android.graphics.Rect bounds = windowMetrics.getBounds();
+            screenWidth = bounds.width();
+            screenHeight = bounds.height();
+        } else {
+            android.util.DisplayMetrics displayMetrics = new android.util.DisplayMetrics();
+            windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+            screenWidth = displayMetrics.widthPixels;
+            screenHeight = displayMetrics.heightPixels;
+        }
+
         dragHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -191,8 +208,13 @@ public class OverlayService extends Service {
                     case MotionEvent.ACTION_MOVE:
                         // Only handle drag if it's not a double click
                         if (System.currentTimeMillis() - lastClickTime > 100) {
-                            menuParams.x = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
-                            menuParams.y = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
+                            int newX = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
+                            int newY = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
+
+                            // 限制在屏幕范围内，防止 Insets 因越界而失效
+                            menuParams.x = Math.max(0, Math.min(newX, screenWidth - menuView.getWidth()));
+                            menuParams.y = Math.max(0, Math.min(newY, screenHeight - menuView.getHeight()));
+
                             windowManager.updateViewLayout(menuView, menuParams);
                         }
                         return true;
