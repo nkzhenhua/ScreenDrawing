@@ -92,8 +92,8 @@
         android:id="@+id/dividerView"
         android:layout_width="32dp"
         android:layout_height="1dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="2dp"
         android:background="#33FFFFFF" />
 
     <!-- 4. 退出 (电源) -->

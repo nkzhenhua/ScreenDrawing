@@ -4,7 +4,7 @@
     <dimen name="floating_menu_width">72dp</dimen>
     <dimen name="floating_menu_corner_radius">36dp</dimen>
     <dimen name="floating_menu_elevation">8dp</dimen>
-    <dimen name="floating_menu_padding_bottom">10dp</dimen>
+    <dimen name="floating_menu_padding_bottom">8dp</dimen>
 
     <!-- Drag Handle -->
     <dimen name="drag_handle_width">24dp</dimen>
@@ -14,7 +14,7 @@
 
     <!-- Menu Buttons -->
     <dimen name="menu_button_size">48dp</dimen>
-    <dimen name="menu_button_margin_top">4dp</dimen>
+    <dimen name="menu_button_margin_top">2dp</dimen>
     <dimen name="menu_icon_size">24dp</dimen>
 
     <!-- Active Brush Background -->
