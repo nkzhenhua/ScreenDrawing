@@ -17,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 // Your custom view imports
 import com.eink.screendrawing.DrawingView;
@@ -58,9 +61,14 @@ public class OverlayService extends Service {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE 
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN 
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 PixelFormat.TRANSLUCENT
         );
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            drawParams.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
         windowManager.addView(drawingView, drawParams);
 
         // Initialize menu
@@ -72,14 +80,40 @@ public class OverlayService extends Service {
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE 
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN 
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 PixelFormat.TRANSLUCENT
         );
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            menuParams.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
         menuParams.gravity = Gravity.TOP | Gravity.LEFT;
         menuParams.x = 0;
         menuParams.y = 0;
 
         windowManager.addView(menuView, menuParams);
+
+        // 处理状态栏避让：将系统栏高度应用为菜单顶部内边距
+        // 这样即使菜单窗口在 y=0 处，交互区域（手柄）也会避开系统状态栏的触摸拦截区
+        int initialPaddingTop = menuView.getPaddingTop();
+        int initialPaddingBottom = menuView.getPaddingBottom();
+        int initialPaddingLeft = menuView.getPaddingLeft();
+        int initialPaddingRight = menuView.getPaddingRight();
+
+        // 处理状态栏避让：将系统栏高度应用为菜单顶部内边距
+        // 只要菜单不超出屏幕边缘，Insets 就会保持稳定
+        ViewCompat.setOnApplyWindowInsetsListener(menuView, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(
+                initialPaddingLeft + systemBars.left,
+                initialPaddingTop + systemBars.top,
+                initialPaddingRight + systemBars.right,
+                initialPaddingBottom + systemBars.bottom
+            );
+            return insets;
+        });
+
         setupMenuButtons(menuParams);
     }
 
@@ -135,6 +169,21 @@ public class OverlayService extends Service {
         final float[] initialTouchX = new float[1];
         final float[] initialTouchY = new float[1];
 
+        // 获取屏幕尺寸用于边界限制
+        final int screenWidth;
+        final int screenHeight;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            android.view.WindowMetrics windowMetrics = windowManager.getCurrentWindowMetrics();
+            android.graphics.Rect bounds = windowMetrics.getBounds();
+            screenWidth = bounds.width();
+            screenHeight = bounds.height();
+        } else {
+            android.util.DisplayMetrics displayMetrics = new android.util.DisplayMetrics();
+            windowManager.getDefaultDisplay().getRealMetrics(displayMetrics);
+            screenWidth = displayMetrics.widthPixels;
+            screenHeight = displayMetrics.heightPixels;
+        }
+
         dragHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -159,8 +208,13 @@ public class OverlayService extends Service {
                     case MotionEvent.ACTION_MOVE:
                         // Only handle drag if it's not a double click
                         if (System.currentTimeMillis() - lastClickTime > 100) {
-                            menuParams.x = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
-                            menuParams.y = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
+                            int newX = initialX[0] + (int) (event.getRawX() - initialTouchX[0]);
+                            int newY = initialY[0] + (int) (event.getRawY() - initialTouchY[0]);
+
+                            // 限制在屏幕范围内，防止 Insets 因越界而失效
+                            menuParams.x = Math.max(0, Math.min(newX, screenWidth - menuView.getWidth()));
+                            menuParams.y = Math.max(0, Math.min(newY, screenHeight - menuView.getHeight()));
+
                             windowManager.updateViewLayout(menuView, menuParams);
                         }
                         return true;
